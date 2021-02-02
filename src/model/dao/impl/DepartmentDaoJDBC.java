@@ -2,6 +2,7 @@ package model.dao.impl;
 
 import db.DB;
 import db.DBException;
+import db.DBIntegrityException;
 import model.dao.DepartmentDao;
 import model.entities.Department;
 
@@ -88,7 +89,7 @@ public class DepartmentDaoJDBC implements DepartmentDao {
                 throw new DBException("Invalid ID! No rows were affected!");
             }
         } catch (SQLException e) {
-            throw new DBException(e.getMessage());
+            throw new DBIntegrityException(e.getMessage());
         } finally {
             DB.closeStatement(ps);
         }
