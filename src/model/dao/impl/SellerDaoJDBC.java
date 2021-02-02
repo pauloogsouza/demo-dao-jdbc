@@ -24,6 +24,8 @@ public class SellerDaoJDBC implements SellerDao {
     public void insert(Seller obj) {
         PreparedStatement ps = null;
         try {
+            insertUpdate();
+
             ps = conn.prepareStatement("INSERT INTO seller(Name, Email, BirthDate, BaseSalary, DepartmentId)" +
                     " VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 
@@ -227,5 +229,22 @@ public class SellerDaoJDBC implements SellerDao {
         seller.setBaseSalary(set.getDouble("BaseSalary"));
         seller.setDepartment(dep);
         return seller;
+    }
+
+    private void insertUpdate() throws SQLException {
+        PreparedStatement ps = conn.prepareStatement("SELECT MAX(Id) FROM seller");
+
+        ResultSet rs = ps.executeQuery();
+
+        int value = 0;
+        if (rs.next()) {
+            value = rs.getInt(1);
+        }
+
+        ps = conn.prepareStatement("ALTER TABLE seller AUTO_INCREMENT = ?");
+
+        ps.setInt(1, value + 1);
+
+        ps.executeUpdate();
     }
 }
