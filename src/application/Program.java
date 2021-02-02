@@ -4,6 +4,7 @@ import model.dao.DaoFactory;
 import model.dao.SellerDao;
 import model.entities.Seller;
 
+import java.util.List;
 import java.util.Locale;
 
 public class Program {
@@ -16,5 +17,8 @@ public class Program {
         Seller seller = sellerDao.findById(3);
         System.out.println(seller);
 
+        System.out.println("=== TEST 2: seller findAll ===");
+        List<Seller> list = sellerDao.findAll();
+        list.forEach(System.out::println);
     }
 }
