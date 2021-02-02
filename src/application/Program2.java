@@ -23,12 +23,15 @@ public class Program2 {
 
         System.out.println("=== TEST 3 - insert ===");
         dep = new Department(null, "Food");
-        //departmentDao.insert(dep);
-        //System.out.println("Inserted! New ID = " + dep.getId());
+        departmentDao.insert(dep);
+        System.out.println("Inserted! New ID = " + dep.getId());
 
         System.out.println("=== TEST 4 - update ===");
         dep = departmentDao.findById(6);
         dep.setName("Plane");
         departmentDao.update(dep);
+
+        System.out.println("=== TEST 5 - delete ===");
+        departmentDao.deleteById(6);
     }
 }
