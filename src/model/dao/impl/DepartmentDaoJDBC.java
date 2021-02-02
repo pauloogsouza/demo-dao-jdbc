@@ -5,10 +5,7 @@ import db.DBException;
 import model.dao.DepartmentDao;
 import model.entities.Department;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +19,32 @@ public class DepartmentDaoJDBC implements DepartmentDao {
 
     @Override
     public void insert(Department obj) {
+        PreparedStatement ps = null;
 
+        try {
+            insertUpdate();
+
+            ps = conn.prepareStatement("INSERT INTO department(Name) VALUES (?)", Statement.RETURN_GENERATED_KEYS);
+
+            ps.setString(1, obj.getName());
+
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected > 0) {
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    int key = rs.getInt(1);
+                    obj.setId(key);
+                }
+                DB.closeResultSet(rs);
+            } else {
+                throw new DBException("Unexpected Error! No rows were affected!");
+            }
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage());
+        } finally {
+            DB.closeStatement(ps);
+        }
     }
 
     @Override
@@ -92,5 +114,22 @@ public class DepartmentDaoJDBC implements DepartmentDao {
         dep.setId(rs.getInt("Id"));
         dep.setName(rs.getString("Name"));
         return dep;
+    }
+
+    private void insertUpdate() throws SQLException {
+        PreparedStatement ps = conn.prepareStatement("SELECT MAX(Id) FROM department");
+
+        ResultSet rs = ps.executeQuery();
+
+        int value = 0;
+        if (rs.next()) {
+            value = rs.getInt(1);
+        }
+
+        ps = conn.prepareStatement("ALTER TABLE department AUTO_INCREMENT = ?");
+
+        ps.setInt(1, value + 1);
+
+        ps.executeUpdate();
     }
 }
